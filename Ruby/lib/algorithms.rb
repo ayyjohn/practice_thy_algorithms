@@ -4,7 +4,8 @@
 # The result is called a 'digital root'.
 # Do not use string conversion within your method.
 def digital_root(number)
-
+  return number if number == 9
+  number % 9
 end
 
 # Write a function that takes a message and an increment amount.
@@ -12,7 +13,16 @@ end
 # Assume lowercase and no punctuation.
 # Preserve spaces.
 def caesar_cipher(string, shift)
-
+  shift = shift % 26
+  string = string.split("")
+  string.each_with_index do |char, index|
+    next if char == " "
+    string[index] = (char.ord + shift).chr
+    if string[index] > "z"
+      string[index] = (string[index].ord - 26).chr
+    end
+  end
+  string.join("")
 end
 
 # Write a function that takes two strings.
@@ -24,27 +34,37 @@ end
 # Write a function that takes an array of integers and returns their sum.
 # Use recursion.
 def sum_rec(numbers)
-
+  return 0 if numbers.empty?
+  numbers.pop + sum_rec(numbers)
 end
 
 # Write a function that takes n, the length of the sequence.
 # Return the first n elements from the fibonnacci sequence as an array.
 def fibs(n)
-
+  return [0] if n == 1
+  return [0, 1] if n == 2
+  prev = fibs(n - 1)
+  next_fib = prev[-1] + prev[-2]
+  prev << next_fib
 end
 
 # Write a function that takes a string.
 # Return true if the string is a palindrome, otherwise return false.
 # It should take less time and memory than reversing the string.
 def is_palindrome?(string)
-
+  len = string.length
+  (0..len / 2).each do |i|
+    return false if string[i] != string[-1 - i]
+  end
+  true
 end
 
 # Write a method that takes a string as input.
 # It should return true if the input is a valid IPv4 address.
 # Valid IPs are anything between '0.0.0.0' and '255.255.255.255'.
 def valid_ip?(string)
-
+  individuals = string.split(".").map(&:to_i)
+  individuals.all? { |num| (0..255).cover?(num) }
 end
 
 # Implement the Folding Cipher.
@@ -56,14 +76,28 @@ end
 
 # Write a method that finds all the unique substrings for a word.
 def uniq_subs(string)
-
+  subs = {}
+  0.upto(string.length - 1) do |i|
+    i.upto(string.length - 1) do |j|
+      subs[string[i..j]] = true
+    end
+  end
+  subs.keys
 end
 
 # Given an array of integers find the largest contiguous subsum.
 # You can solve this trivially in O(n**2) time by considering all subarrays.
 # Try to solve it in O(n) time with O(1) memory.
-def lcs(array)
 
+def lcs(array)
+  largest_sum = 0
+  current_sum = 0
+  array.each do |el|
+    current_sum += el
+    largest_sum = current_sum if current_sum > largest_sum
+    current_sum = 0 if current_sum <= 0
+  end
+  largest_sum
 end
 
 # Write a function that takes a year as a four digit integer.
@@ -93,24 +127,68 @@ end
 # Implement Merge Sort
 # Hint: This typically involves a helper function.
 def merge_sort(array)
+  return array if array.length <= 1
 
+  middle = array.length / 2
+  left = array.take(middle)
+  right = array.drop(middle)
+
+  merge(merge_sort(left), merge_sort(right))
 end
 
 def merge(left, right)
-
+  merged = []
+  until left.empty? || right.empty?
+    if left.first <= right.first
+      merged << left.shift
+    else
+      merged << right.shift
+    end
+  end
+  merged.concat(left).concat(right)
 end
 
 # Implement binary search.
 # Return nil if the target isn't found.
 def binary_search(array, target)
+  return nil if array.empty?
+  middle = array.length / 2
+  middle_value = array[middle]
 
+  if target == middle_value
+    return middle
+  elsif target < middle_value
+    next_search = binary_search(array[0...middle], target)
+  else
+    next_search = binary_search(array[middle + 1..-1], target)
+    if next_search
+      return middle + next_search
+    else
+      nil
+    end
+  end
 end
 
 # You are given a list of numbers in an array.
 # Replace all the numbers with the product of all other numbers.
 # Do this in O(n) time without using division.
 def productify(array)
-
+  if array.count(0) == 2
+    return [0] * array.length
+  elsif array.count(0) == 1
+    product = array.inject do |el, accum|
+      if el == 0
+        1 * accum
+      else
+        el * accum
+      end
+    end
+  else
+    product = array.inject(:*)
+  end
+  array.map do |el|
+    product / el
+  end
 end
 
 # Write a function that takes an array and returns all of its subsets.
@@ -277,5 +355,5 @@ end
 
 # Write a method that takes an array and returns all its permutations.
 def permutations(array)
-  
+
 end
